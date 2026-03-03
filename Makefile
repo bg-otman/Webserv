@@ -10,7 +10,7 @@ SRC = \
 	src/HttpParser.cpp \
 	src/Router.cpp \
 	src/CGIHandler.cpp \
-	src/HttpRequest.cpp
+	src/HttpRequest.cpp src/Utils.cpp
 
 OBJ = $(SRC:.cpp=.o)
 

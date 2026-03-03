@@ -3,8 +3,25 @@
 
 #include "libs.hpp"
 #include "HttpRequest.hpp"
+#include "Utils.hpp"
+
+enum StatusCode {
+    OK = 200,
+    CREATED = 201,
+    NO_CONTENT = 204,
+    BAD_REQUEST = 400,
+    FORBIDDEN = 403,
+    NOT_FOUND = 404,
+    METHOD_NOT_ALLOWED = 405,
+    PAYLOAD_TOO_LARGE = 413,
+    URI_TOO_LONG = 414,
+    INTERNAL_SERVER_ERROR = 500,
+    NOT_IMPLEMENTED = 501,
+    HTTP_VERSION_NOT_SUPPORTED = 505
+};
 
 enum ParseResult {
+	NONE,
     INCOMPLETE,
     COMPLETE,
     ERROR
@@ -24,15 +41,16 @@ class HttpParser
         size_t		expectedBodySize;
 		int			errorCode;
 
-		void		parseRequestLine();
-		void		parseHeaders();
-		void		parseBody();
+		ParseResult		parseRequestLine();
+		ParseResult		parseHeaders();
+		// ParseResult		parseBody();
+		// ParseResult		parseChunkBody();
     public:
         HttpParser();
         ~HttpParser();
-		ParseResult		parseRequest(const std::string& data);
-		HttpRequest&	getRequest( void ) const;
-		int				getErrorCode( void ) const;
+		ParseResult         parseRequest(const std::string& data);
+		const HttpRequest&  getRequest( void ) const;
+		int				    getErrorCode( void ) const;
 };
 
 
