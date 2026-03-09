@@ -9,5 +9,7 @@
 #include <stdexcept>
 #include <map>
 #include <cstdlib>
+#include <algorithm>
+#include <cstring>
 
 #endif

@@ -1,7 +1,7 @@
 NAME = webserv
 
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g
 
 SRC = \
 	src/main.cpp \
@@ -10,7 +10,7 @@ SRC = \
 	src/HttpParser.cpp \
 	src/Router.cpp \
 	src/CGIHandler.cpp \
-	src/HttpRequest.cpp
+	src/HttpRequest.cpp src/Utils.cpp
 
 OBJ = $(SRC:.cpp=.o)
 

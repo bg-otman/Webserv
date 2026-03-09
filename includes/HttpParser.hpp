@@ -3,11 +3,28 @@
 
 #include "libs.hpp"
 #include "HttpRequest.hpp"
+#include "Utils.hpp"
+
+enum StatusCode {
+    OK = 200,
+    CREATED = 201,
+    NO_CONTENT = 204,
+    BAD_REQUEST = 400,
+    FORBIDDEN = 403,
+    NOT_FOUND = 404,
+    METHOD_NOT_ALLOWED = 405,
+    CONTENT_LENGTH_REQUIRED = 411,
+    PAYLOAD_TOO_LARGE = 413,
+    URI_TOO_LONG = 414,
+    INTERNAL_SERVER_ERROR = 500,
+    NOT_IMPLEMENTED = 501,
+    HTTP_VERSION_NOT_SUPPORTED = 505
+};
 
 enum ParseResult {
+	NONE,
     INCOMPLETE,
     COMPLETE,
-    ERROR
 };
 
 class HttpParser
@@ -18,22 +35,38 @@ class HttpParser
             HEADERS,
             BODY,
         };
-        ParseState	state;
-        std::string	buffer;
-		HttpRequest	request;
-        size_t		expectedBodySize;
-		int			errorCode;
+        enum BodyType {
+            NO_BODY,
+            CONTENT_LENGTH,
+            CHUNKED
+        };
+        enum ChunkState {
+            CHUNK_SIZE,
+            CHUNK_DATA
+        };
+        ParseState	_state;
+        std::string	_buffer;
+		HttpRequest	_request;
+        size_t		_expectedBodySize;
+        BodyType	_bodyType;
+        ChunkState  _chunkState;
+		int			_statusCode;
 
-		void		parseRequestLine();
-		void		parseHeaders();
-		void		parseBody();
+		ParseResult		parseRequestLine( void );
+		ParseResult		parseHeaders( void );
+		ParseResult		parseBody( void );
+
+        void            setBodyType( const std::map<std::string, std::string>& headers );
+        ParseResult     parseLengthBody( void );
+		ParseResult		parseChunkBody( void );
+        void            resetStates( void );
     public:
         HttpParser();
         ~HttpParser();
-		ParseResult		parseRequest(const std::string& data);
-		HttpRequest&	getRequest( void ) const;
-		int				getErrorCode( void ) const;
+		ParseResult         parseRequest(const std::string& data);
+		const HttpRequest&  getRequest( void ) const;
+        void                setStatusCode(StatusCode statusCode);
+		int				    getStatusCode( void ) const;
 };
-
 
 #endif
