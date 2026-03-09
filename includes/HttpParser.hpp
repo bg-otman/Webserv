@@ -50,7 +50,7 @@ class HttpParser
         size_t		_expectedBodySize;
         BodyType	_bodyType;
         ChunkState  _chunkState;
-		int			_statusCode;
+		int			_errorCode;
 
 		ParseResult		parseRequestLine( void );
 		ParseResult		parseHeaders( void );
@@ -65,8 +65,8 @@ class HttpParser
         ~HttpParser();
 		ParseResult         parseRequest(const std::string& data);
 		const HttpRequest&  getRequest( void ) const;
-        void                setStatusCode(StatusCode statusCode);
-		int				    getStatusCode( void ) const;
+        void                setErrorCode(StatusCode statusCode);
+		int				    getErrorCode( void ) const;
 };
 
 #endif

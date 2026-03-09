@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     catch (const std::exception& e)
     {
         std::cout << e.what() << std::endl;
-        std::cout << "status code is : " << parse.getStatusCode() << std::endl;
+        std::cout << "status code is : " << parse.getErrorCode() << std::endl;
         return 1;
     }
     const HttpRequest request = parse.getRequest();
