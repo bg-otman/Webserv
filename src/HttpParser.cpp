@@ -43,6 +43,7 @@ ParseResult HttpParser::parseRequestLine( void )
     size_t                      uriMaxLength = 8000;
     size_t                      p_size = strlen("HTTP/"); // Pattern size
     double                      version = 0.0;
+    char*                       endptr = NULL;
 
     if (pos == std::string::npos)
         return INCOMPLETE;
@@ -55,28 +56,22 @@ ParseResult HttpParser::parseRequestLine( void )
     this->_buffer.erase(0, pos + 2); // 2 for \r\n
     if (requestLine.size() != 3)
     {
-        if (requestLine.size() == 2)
-            requestLine.push_back("HTTP/0.9"); // default version
-        else
-            setErrorCode(BAD_REQUEST);
+        if (requestLine.size() == 2) requestLine.push_back("HTTP/0.9"); // default version
+        else setErrorCode(BAD_REQUEST);
     } else if (requestLine.size() == 3 && requestLine[2] == "HTTP/0.9")
             setErrorCode(BAD_REQUEST);
-    if (!_errorCode && (requestLine[0] != "GET" && requestLine[0] != "POST"
-                            && requestLine[0] != "DELETE"))
+    if (requestLine[0] != "GET" && requestLine[0] != "POST"
+                            && requestLine[0] != "DELETE")
         Utils::isAllUpper(requestLine[0]) ? setErrorCode(METHOD_NOT_ALLOWED) : setErrorCode(BAD_REQUEST);
-    if (!_errorCode && requestLine[1].length() > uriMaxLength)
+    if (requestLine[1].length() > uriMaxLength)
         setErrorCode(URI_TOO_LONG);
-    if (!_errorCode && requestLine[2].substr(0, p_size) != "HTTP/")
+    if (requestLine[2].substr(0, p_size) != "HTTP/")
             setErrorCode(BAD_REQUEST);
-    else if (!_errorCode)
-    {
-        char *endptr = NULL;
-        version = strtod(requestLine[2].substr(p_size, requestLine[2].length() - p_size).c_str(), &endptr);
-        if (version < 0.9 || *endptr)
-            setErrorCode(BAD_REQUEST);
-        else if (version > 1.1)
-            setErrorCode(HTTP_VERSION_NOT_SUPPORTED);
-    }
+    version = strtod(requestLine[2].substr(p_size, requestLine[2].length() - p_size).c_str(), &endptr);
+    if (version < 0.9 || *endptr)
+        setErrorCode(BAD_REQUEST);
+    else if (version > 1.1)
+        setErrorCode(HTTP_VERSION_NOT_SUPPORTED);
     this->_request.setMethod(requestLine[0]);
     this->_request.setPath(requestLine[1]);
     this->_request.setVersion(requestLine[2]);
