@@ -1,6 +1,7 @@
 #include "Config.hpp"
-#include "../includes/HttpParser.hpp"
-#include "../includes/HttpResponse.hpp"
+#include "HttpParser.hpp"
+#include "HttpResponse.hpp"
+#include "Server.hpp"
 
 void    print_request(const HttpRequest& request)
 {
@@ -30,38 +31,15 @@ int main(int argc, char **argv) {
         std::cerr << "Usage: ./webserv [config_file]" << std::endl;
         return 1;
     }
+    int i = 0;
     try {
         ConfigParser parser(argv[1]);
         std::cout << "✅ Configuration parsed and validated successfully!" << std::endl;
+        i = 1;
+        Server server;
+        server.init(parser.getServers());
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
-        return 1;
     }
-
-    HttpParser parse;
-    HttpRequest request;
-    HttpResponse response;
-
-    try
-    {
-        ParseResult res = parse.parseRequest("\r\nGET /index.html HTTP/1.1\r\nHost: localhost:8080\r\ntest: hey\r\n\r\n\r\n");
-        if (res == INCOMPLETE)
-            throw std::runtime_error("JUST FOR TESTING:  Request is incomplete");
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << "\n" << e.what() << std::endl;
-        std::cout << "\nERROR RESPONSE : " << std::endl;
-        std::cout << response.errorResponse(static_cast<StatusCode>(parse.getErrorCode()), "www/error/400.html");
-        return 1;
-    }
-    request = parse.getRequest();
-    print_request(request);
-
-    std::string raw_resp = response.handleRequest(request);
-
-    std::cout << "\nResponse: " << std::endl;
-    std::cout << raw_resp;
-
     return 0;
 }
